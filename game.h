@@ -9,14 +9,29 @@
 #define GAME_TTT 1
 #define GAME_CONNECT4 2
 #define GAME_BATTLESHIP 3
+#define GAME_REVERSI 4
 
-#define GAME_COUNT 4
+#define GAME_COUNT 5
+
+#define TEXT_SPEED 6
 
 int tick = 0;
-int game = GAME_MENU;
-bool needsReset = false;
+unsigned char game = GAME_MENU;
+bool needsReset = true;
+
 Cube utilCube1;
 Cube utilCube2;
+bool utilBool1;
+bool utilBool2;
+unsigned char utilUChar1;
+unsigned char utilUChar2;
+unsigned char utilUChar3;
+char utilChar1;
+char utilChar2;
+char utilChar3;
+char utilChar4;
+char utilChar5;
+char utilChar6;
 
 namespace CursorSpace{
     char cursorX = 0;
@@ -26,10 +41,15 @@ namespace CursorSpace{
 
 namespace MenuSpace{
 
-    int select = 0;
-    const int selectCount = GAME_COUNT-1;
+    char select = 0; // not using util so it stays what it was
+    const char selectCount = GAME_COUNT-1;
 
     void play(bool inputs[]){
+
+        if(needsReset){
+            select = 0;
+            needsReset = false;
+        }
 
         if(inputs[KEY_Xd]){
             select--;
@@ -45,7 +65,7 @@ namespace MenuSpace{
 
         display.clearAll();
 
-        const int logoTime = 40; // 4 seconds
+        const unsigned char logoTime = 40; // 4 seconds
 
         switch(select+1){
             case GAME_TTT:{
@@ -58,7 +78,7 @@ namespace MenuSpace{
                     display.set2DPattern(1, " # #", 2);
                     display.set2DPattern(0, "  # ", 2);
                 }else{
-                    switch(((tick-logoTime)/4)%10){
+                    switch(((tick-logoTime)/TEXT_SPEED)%10){
                         case 0: display.letter('T', 1); break;
                         case 1: display.letter('I', 1); break;
                         case 2: display.letter('C', 1); break;
@@ -85,7 +105,7 @@ namespace MenuSpace{
                     display.set2DPattern(1, " ###", 2);
                     display.set2DPattern(0, "   #", 2);
                 }else{
-                    switch(((tick-logoTime)/4)%9){
+                    switch(((tick-logoTime)/TEXT_SPEED)%9){
                         case 0: display.letter('C', 2); break;
                         case 1: display.letter('O', 2); break;
                         case 2: display.letter('N', 2); break;
@@ -108,21 +128,41 @@ namespace MenuSpace{
                     display.set2DPattern(1, "####", 1);
                     display.set2DPattern(0, "####", 2);
                 }else{
-                    switch(((tick-logoTime)/4)%11){
+                    switch(((tick-logoTime)/TEXT_SPEED)%11){
                         case 0: display.letter('B', 1); break;
                         case 1: display.letter('A', 1); break;
                         case 2: display.letter('T', 1); break;
-                        case 3: display.letter('T', 1); break;
-                        case 4: display.letter('L', 1); break;
-                        case 5: display.letter('E', 1); break;
-                        case 6: display.letter('S', 2); break;
-                        case 7: display.letter('H', 2); break;
-                        case 8: display.letter('I', 2); break;
-                        case 9: display.letter('P', 2); break;
+                        case 3: display.letter('T', 2); break;
+                        case 4: display.letter('L', 2); break;
+                        case 5: display.letter('E', 2); break;
+                        case 6: display.letter('S', 3); break;
+                        case 7: display.letter('H', 3); break;
+                        case 8: display.letter('I', 3); break;
+                        case 9: display.letter('P', 3); break;
                         case 10: break;
                     }
                 }
 
+                break;
+            }
+            case GAME_REVERSI:{
+                if(tick < logoTime){
+                    display.set2DPattern(2, "  # ", 1);
+                    display.set2DPattern(1, " #  ", 1);
+                    display.set2DPattern(2, " #  ", 2);
+                    display.set2DPattern(1, "  # ", 2);
+                }else{
+                    switch(((tick-logoTime)/TEXT_SPEED)%8){
+                        case 0: display.letter('R', 1); break;
+                        case 1: display.letter('E', 1); break;
+                        case 2: display.letter('V', 1); break;
+                        case 3: display.letter('E', 1); break;
+                        case 4: display.letter('R', 1); break;
+                        case 5: display.letter('S', 2); break;
+                        case 6: display.letter('I', 2); break;
+                        case 7: break;
+                    }
+                }
                 break;
             }
         }
@@ -138,6 +178,7 @@ namespace MenuSpace{
     }
 }
 
+// used in ticktactoe and connect4
 void checkWin(Cube& ticTacToe, Cube& winCube, unsigned char& winner){
     // check in z
     for(unsigned char x = 0; !winner && x < 4; x++){
@@ -207,7 +248,7 @@ void checkWin(Cube& ticTacToe, Cube& winCube, unsigned char& winner){
         winCube.clearAll();
         unsigned char a = ticTacToe.get(x, 0, 0);
         winCube.set(x, 0, 0, a);
-        for(int i = 1; i < 4; i++){
+        for(unsigned char i = 1; i < 4; i++){
             if(a != ticTacToe.get(x, i, i)){
                 a = 0;
             }else{
@@ -221,7 +262,7 @@ void checkWin(Cube& ticTacToe, Cube& winCube, unsigned char& winner){
             winCube.clearAll();
             unsigned char a = ticTacToe.get(x, 3-0, 0);
             winCube.set(x, 3-0, 0, a);
-            for(int i = 1; i < 4; i++){
+            for(unsigned char i = 1; i < 4; i++){
                 if(a != ticTacToe.get(x, 3-i, i)){
                     a = 0;
                 }else{
@@ -238,7 +279,7 @@ void checkWin(Cube& ticTacToe, Cube& winCube, unsigned char& winner){
         winCube.clearAll();
         unsigned char a = ticTacToe.get(0, 0, z);
         winCube.set(0, 0, z, a);
-        for(int i = 1; i < 4; i++){
+        for(unsigned char i = 1; i < 4; i++){
             if(a != ticTacToe.get(i, i, z)){
                 a = 0;
             }else{
@@ -252,7 +293,7 @@ void checkWin(Cube& ticTacToe, Cube& winCube, unsigned char& winner){
             winCube.clearAll();
             unsigned char a = ticTacToe.get(3-0, 0, z);
             winCube.set(3-0, 0, z, a);
-            for(int i = 1; i < 4; i++){
+            for(unsigned char i = 1; i < 4; i++){
                 if(a != ticTacToe.get(3-i, i, z)){
                     a = 0;
                 }else{
@@ -269,7 +310,7 @@ void checkWin(Cube& ticTacToe, Cube& winCube, unsigned char& winner){
         winCube.clearAll();
         unsigned char a = ticTacToe.get(0, y, 0);
         winCube.set(0, y, 0, a);
-        for(int i = 1; i < 4; i++){
+        for(unsigned char i = 1; i < 4; i++){
             if(a != ticTacToe.get(i, y, i)){
                 a = 0;
             }else{
@@ -283,7 +324,7 @@ void checkWin(Cube& ticTacToe, Cube& winCube, unsigned char& winner){
             winCube.clearAll();
             unsigned char a = ticTacToe.get(3-0, y, 0);
             winCube.set(3-0, y, 0, a);
-            for(int i = 1; i < 4; i++){
+            for(unsigned char i = 1; i < 4; i++){
                 if(a != ticTacToe.get(3-i, y, i)){
                     a = 0;
                 }else{
@@ -300,7 +341,7 @@ void checkWin(Cube& ticTacToe, Cube& winCube, unsigned char& winner){
         winCube.clearAll();
         unsigned char a = ticTacToe.get(0, 0, 0);
         winCube.set(0, 0, 0, a);
-        for(int i = 1; i < 4; i++){
+        for(unsigned char i = 1; i < 4; i++){
             if(a != ticTacToe.get(i, i, i)){
                 a = 0;
             }else{
@@ -315,7 +356,7 @@ void checkWin(Cube& ticTacToe, Cube& winCube, unsigned char& winner){
         winCube.clearAll();
         unsigned char a = ticTacToe.get(3-0, 0, 0);
         winCube.set(3-0, 0, 0, a);
-        for(int i = 1; i < 4; i++){
+        for(unsigned char i = 1; i < 4; i++){
             if(a != ticTacToe.get(3-i, i, i)){
                 a = 0;
             }else{
@@ -330,7 +371,7 @@ void checkWin(Cube& ticTacToe, Cube& winCube, unsigned char& winner){
         winCube.clearAll();
         unsigned char a = ticTacToe.get(0, 3-0, 0);
         winCube.set(0, 3-0, 0, a);
-        for(int i = 1; i < 4; i++){
+        for(unsigned char i = 1; i < 4; i++){
             if(a != ticTacToe.get(i, 3-i, i)){
                 a = 0;
             }else{
@@ -345,7 +386,7 @@ void checkWin(Cube& ticTacToe, Cube& winCube, unsigned char& winner){
         winCube.clearAll();
         unsigned char a = ticTacToe.get(0, 0, 3-0);
         winCube.set(0, 0, 3-0, a);
-        for(int i = 1; i < 4; i++){
+        for(unsigned char i = 1; i < 4; i++){
             if(a != ticTacToe.get(i, i, 3-i)){
                 a = 0;
             }else{
@@ -363,8 +404,8 @@ namespace TTTSpace{
 
     Cube& ticTacToe = utilCube1;
     Cube& winCube = utilCube2;
-    bool player1Turn = true;
-    unsigned char winner = 0;
+    bool& player1Turn = utilBool1;
+    unsigned char& winner = utilUChar1;
 
     void play(bool inputs[]){
 
@@ -397,6 +438,7 @@ namespace TTTSpace{
             }
             
             if(inputs[KEY_Enter]){
+                tick = 0;
                 game = GAME_MENU;
             }
             
@@ -434,8 +476,8 @@ namespace CONNECT4Space{
 
     Cube& sandCube = utilCube1;
     Cube& winCube = utilCube2;
-    bool player1Turn = true;
-    unsigned char winner = 0;
+    bool& player1Turn = utilBool1;
+    unsigned char& winner = utilUChar1;
 
     void play(bool inputs[]){
 
@@ -468,6 +510,7 @@ namespace CONNECT4Space{
             }
             
             if(inputs[KEY_Enter]){
+                tick = 0;
                 game = GAME_MENU;
             }
             
@@ -511,28 +554,28 @@ namespace BATTLESHIPSpace{
 
     Cube& p1Field = utilCube1;
     Cube& p2Field = utilCube2;
-    const int modeChoosePre = 0;
-    const int modeChoosePos = 1;
-    const int modeChooseAngle = 2;
+    const unsigned char modeChoosePre = 0;
+    const unsigned char modeChoosePos = 1;
+    const unsigned char modeChooseAngle = 2;
 
-    const int modeReadyForPlayer = 3;
-    const int modeOwnFiled = 4;
-    const int modeViewOfOtherBefore = 5;
-    const int modeViewOfOtherAfter = 6;
+    const unsigned char modeReadyForPlayer = 3;
+    const unsigned char modeOwnFiled = 4;
+    const unsigned char modeViewOfOtherBefore = 5;
+    const unsigned char modeViewOfOtherAfter = 6;
 
-    const int modeWinner = 7;
-    const int modeShowFieldEnd = 8;
+    const unsigned char modeWinner = 7;
+    const unsigned char modeShowFieldEnd = 8;
 
-    int winner = 0;
-    int mode = modeChoosePre;
-    int editShipIndex = 0;
-    bool player1Turn = true;
-    char shipPlaceX = 0;
-    char shipPlaceY = 0;
-    char shipPlaceZ = 0;
-    char shipPlaceAX = 0;
-    char shipPlaceAY = 0;
-    char shipPlaceAZ = 0;
+    unsigned char& winner = utilUChar1;
+    unsigned char& mode = utilUChar2;
+    unsigned char& editShipIndex = utilUChar3;
+    bool& player1Turn = utilBool1;
+    char& shipPlaceX = utilChar1;
+    char& shipPlaceY = utilChar2;
+    char& shipPlaceZ = utilChar3;
+    char& shipPlaceAX = utilChar4;
+    char& shipPlaceAY = utilChar5;
+    char& shipPlaceAZ = utilChar6;
 
     const unsigned char shipCount = 4;
     const unsigned char shipSizes[shipCount] = {3, 3, 3, 2};
@@ -560,7 +603,7 @@ namespace BATTLESHIPSpace{
 
         switch(mode){
             case modeChoosePre:{
-                switch((tick/4)%8){
+                switch((tick/TEXT_SPEED)%8){
                     case 0: display.letter('P', 1); break;
                     case 1: display.letter(player1Turn?'1':'2', 1); break;
                     case 2: display.letter('S', 2); break;
@@ -644,11 +687,18 @@ namespace BATTLESHIPSpace{
                             mode = modeChoosePos;
                         }
                     }
+                }else{
+                    if(inputs[KEY_Enter]){
+                        mode = modeChoosePos;
+                        cursorX = shipPlaceX;
+                        cursorY = shipPlaceY;
+                        cursorZ = shipPlaceZ;
+                    }
                 }
                 break;
             }
             case modeReadyForPlayer:{
-                switch((tick/4)%2){
+                switch((tick/TEXT_SPEED)%2){
                     case 0: display.letter('P', 1); break;
                     case 1: display.letter(player1Turn?'1':'2', 1); break;
                 }
@@ -710,6 +760,7 @@ namespace BATTLESHIPSpace{
                 }
                 if(inputs[KEY_Enter]){
                     if(playerWon){
+                        tick = 0;
                         mode = modeWinner;
                         winner = player1Turn?1:2;
                     }else{
@@ -720,7 +771,7 @@ namespace BATTLESHIPSpace{
                 break;
             }
             case modeWinner:{
-                switch((tick/4)%8){
+                switch((tick/TEXT_SPEED)%8){
                     case 0: display.letter('P', 1); break;
                     case 1: display.letter(player1Turn?'1':'2', 1); break;
                     case 2: display.letter('W', 2); break;
@@ -752,6 +803,213 @@ namespace BATTLESHIPSpace{
 
     }
 
+}
+
+namespace REVERSISpace{
+
+    Cube& board = utilCube1;
+    bool& player1Turn = utilBool1;
+    unsigned char& winner = utilUChar1;
+    bool& playerCantPlay = utilBool2;
+
+    bool tryLine(unsigned char player, char x, char y, char z, char xs, char ys, char zs){
+        unsigned char other = player==1?2:1;
+        bool found = false;
+        for(unsigned char i = 1; true; i++){
+            char xx = x+xs*i;
+            char yy = y+ys*i;
+            char zz = z+zs*i;
+            if(xx >= 0 && xx < 4 && yy >= 0 && yy < 4 && zz >= 0 && zz < 4){
+                unsigned char here = board.get(xx, yy, zz);
+                if(here == 0){
+                    return false;
+                }else if(here == player){
+                    return found;
+                }else if(here == other){
+                    found = true;
+                }else{
+                    return false;
+                }
+            }else{
+                return false;
+            }
+        }
+    }
+
+    bool fillLine(unsigned char player, char x, char y, char z, char xs, char ys, char zs){
+        unsigned char other = player==1?2:1;
+        bool success = false;
+        if(tryLine(player, x, y, z, xs, ys, zs)){
+            for(unsigned char i = 0; true; i++){
+                char xx = x+xs*i;
+                char yy = y+ys*i;
+                char zz = z+zs*i;
+                if(xx >= 0 && xx < 4 && yy >= 0 && yy < 4 && zz >= 0 && zz < 4){
+                    unsigned char here = board.get(xx, yy, zz);
+                    if(here == other || (i==0)){
+                        board.set(xx, yy, zz, player);
+                        success = true;
+                    }else{
+                        break;
+                    }
+                }else{
+                    break;
+                }
+            }
+        }
+        return success;
+    }
+
+    void play(bool inputs[]){
+        using namespace CursorSpace;
+
+        if(needsReset){
+            board.clearAll();
+            player1Turn = true;
+            winner = 0;
+            playerCantPlay = false;
+
+            board.set(1, 1, 1, 1);
+            board.set(2, 1, 1, 2);
+            board.set(1, 2, 1, 2);
+            board.set(2, 2, 1, 1);
+            board.set(1, 1, 2, 2);
+            board.set(2, 1, 2, 1);
+            board.set(1, 2, 2, 1);
+            board.set(2, 2, 2, 2);
+
+            needsReset = false;
+        }
+
+        if(winner){
+
+            for(unsigned char x = 0; x < 4; x++){
+                for(unsigned char y = 0; y < 4; y++){
+                    for(unsigned char z = 0; z < 4; z++){
+                        if(tick%8 < 4){
+                            display.set(x, y, z, winner);
+                        }else{
+                            display.set(x, y, z, board.get(x, y, z));
+                        }
+                    }
+                }
+            }
+            
+            if(inputs[KEY_Enter]){
+                tick = 0;
+                game = GAME_MENU;
+            }
+            
+
+        }else{
+
+            bool canPlay = false;
+
+            unsigned char p1Count = 0;
+            unsigned char p2Count = 0;
+
+            for(unsigned char x = 0; x < 4; x++){
+                for(unsigned char y = 0; y < 4; y++){
+                    for(unsigned char z = 0; z < 4; z++){
+                        display.set(x, y, z, board.get(x, y, z));
+                        if(board.get(x, y, z) == 0){
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, -1, -1, -1);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, -1, 1, -1);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, -1, -1, 1);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, -1, 1, 1);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, -1, -1, 0);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, -1, 0, -1);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, -1, 1, 0);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, -1, 0, 1);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, -1, 0, 0);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, 1, -1, -1);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, 1, 1, -1);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, 1, -1, 1);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, 1, 1, 1);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, 1, -1, 0);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, 1, 0, -1);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, 1, 1, 0);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, 1, 0, 1);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, 1, 0, 0);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, 0, -1, -1);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, 0, 1, -1);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, 0, -1, 1);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, 0, 1, 1);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, 0, -1, 0);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, 0, 0, -1);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, 0, 1, 0);
+                            canPlay |= tryLine(player1Turn?1:2, x, y, z, 0, 0, 1);
+                        }else{
+                            if(board.get(x, y, z)==1){
+                                p1Count++;
+                            }
+                            if(board.get(x, y, z)==2){
+                                p2Count++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(!canPlay){
+                if(playerCantPlay){
+                    if(p1Count > p2Count){
+                        winner = 1;
+                    }else if(p2Count > p1Count){
+                        winner = 2;
+                    }else{
+                        winner = 3;
+                    }
+                }else{
+                    playerCantPlay = true;
+                    player1Turn = !player1Turn;
+                }
+            }else{
+                playerCantPlay = false;
+            }
+
+            if(tick%4 < 2){
+                display.set(cursorX, cursorY, cursorZ, (board.get(cursorX, cursorY, cursorZ)==0)?(player1Turn?1:2):3);
+            }
+
+            if(inputs[KEY_Enter]){
+                if(board.get(cursorX, cursorY, cursorZ) == 0){
+                    bool placed = false;
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ, -1, -1, -1)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ, -1,  1, -1)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ, -1, -1,  1)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ, -1,  1,  1)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ, -1, -1,  0)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ, -1,  0, -1)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ, -1,  1,  0)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ, -1,  0,  1)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ, -1,  0,  0)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ,  1, -1, -1)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ,  1,  1, -1)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ,  1, -1,  1)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ,  1,  1,  1)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ,  1, -1,  0)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ,  1,  0, -1)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ,  1,  1,  0)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ,  1,  0,  1)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ,  1,  0,  0)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ,  0, -1, -1)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ,  0,  1, -1)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ,  0, -1,  1)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ,  0,  1,  1)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ,  0, -1,  0)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ,  0,  0, -1)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ,  0,  1,  0)){ placed=true; }
+                    if(fillLine(player1Turn?1:2, cursorX, cursorY, cursorZ,  0,  0,  1)){ placed=true; }
+                    if(placed){
+                        player1Turn = !player1Turn;
+                    }
+                }
+            }
+
+        }
+
+    }
 }
 
 void update(bool inputs[]){
@@ -792,9 +1050,14 @@ void update(bool inputs[]){
             BATTLESHIPSpace::play(inputs);
             break;
         }
+        case GAME_REVERSI:{
+            REVERSISpace::play(inputs);
+            break;
+        }
     }
 
     if(inputs[KEY_Exit]){
+        tick = 0;
         game = GAME_MENU;
     }
 
