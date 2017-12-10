@@ -51,7 +51,7 @@ void startRenderer( void(*update)(bool*) ){
             for(unsigned char z = 0; z < 4; z++){
                 for(unsigned char x = 0; x < 4; x++){
                     attron(COLOR_PAIR(display.get(x, y, z)));
-                    mvaddch((4-1-y)*2, z*10+x*2, '.');
+                    mvaddch((4-1-y)*2, z*14+x*3, '.');
                     attroff(COLOR_PAIR(display.get(x, y, z)));
                 }
             }
