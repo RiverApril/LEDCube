@@ -1,10 +1,4 @@
 
-#ifdef USE_CURSES
-#include "renderer.h"
-#else
-// use arduino renderer (once it's made)
-#endif
-
 #define GAME_MENU 0
 #define GAME_TTT 1
 #define GAME_CONNECT4 2
