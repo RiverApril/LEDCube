@@ -24,7 +24,7 @@ For this version the key mappings are:
 # Games
 
 The program starts in a menu showing the logo of the first game: Tic-Tac-Toe.
-After a small delay the logo will disapear and the words "TICTACTOE" will show up on the top layer one letter at a time.
+After a small delay the logo will disappear and the words "TICTACTOE" will show up on the top layer one letter at a time.
 The buttons (pins listed near the top of [chipKitRenderer.h](chipKitRenderer.h)) Xd (X down) and Xu (X up) can be used to cycle through the games.
 
 In the menu each game is displayed in a similar manner as Tic-Tac-Toe with first the logo appearing then the name scrolling by.
@@ -36,7 +36,7 @@ To conform a move the enter key should be pressed.
 # Hardware Design
 
 The Cube is setup to have 32 columns (16 columns really but 2 wires in each for the 2 colors) and 4 layers.
-When a column is powered and a layer is powered the corisponding LED will light.
+When a column is powered and a layer is powered the corresponding LED will light.
 Each light is a bi-colored LED with blue and red individually wired to their own column.
 
 Wiring diagram:
