@@ -17,12 +17,25 @@
 #define KEY_Exit 7
 #define KEY_COUNT 8
 
-const int columnRedPins[4][4] = { {20, 20, 20, 20}, {20, 20, 20, 20}, {20, 20, 20, 20}, {20, 20, 20, 20} };
-const int columnBluePins[4][4] = { {21, 21, 21, 21}, {21, 21, 21, 21}, {21, 21, 21, 21}, {21, 21, 21, 21} };
+/* Chipkit Max32 pin weirdness:
+ *  
+ * Pins 24, 26, 27 are not able to output voltage
+ * 
+ * 43 & 51 are connected to each other
+ * 29 & 50 are connected to each other
+ * After some research, other connected pairs found: 
+ * 40 & 65
+ * 41 & 66
+ * 42 & 67
+ * 
+ */
 
-const int inputPins[KEY_COUNT] = { 0, 0, 0, 0, 8, 10, 9, 0 };
+const int columnBluePins[4][4] = { {5, 48, 46, 44}, {42, 40, 38, 36}, {34, 32, 30, 28}, {1, 2, 22, 52} };
+const int columnRedPins[4][4] = { {6, 31, 39, 47}, {0, 33, 41, 49}, {25, 35, 3, 4}, {23, 37, 45, 53} };
 
-const int levelPins[4] = { 17, 16, 15, 14 };
+const int inputPins[KEY_COUNT] = { 17, 21, 19, 18, 16, 20, 15, 14};
+
+const int levelPins[4] = { 8, 9, 10, 11};
 
 int current_level = 0;
 
@@ -54,11 +67,11 @@ void __attribute__((interrupt)) myISR(){ // Timer 3
 void start_timer_3(uint32_t frequency) {
   uint32_t period;  
   period = TICKS_PER_SECOND / frequency;
-  T3CONCLR = T3_ON;         /* Turn the timer off */
-  T3CON = T3_PS_1_1;        /* Set the prescaler  */
-  TMR3 = 0;                 /* Clear the counter  */
-  PR3 = period;             /* Set the period     */
-  T3CONSET = T3_ON;         /* Turn the timer on  */
+  T3CONCLR = T3_ON;         // Turn the timer off
+  T3CON = T3_PS_1_1;        // Set the prescaler
+  TMR3 = 0;                 // Clear the counter
+  PR3 = period;             // Set the period
+  T3CONSET = T3_ON;         // Turn the timer on
   setIntVector(_TIMER_3_VECTOR, myISR);
   setIntPriority(_TIMER_3_VECTOR, 4, 0);
   clearIntFlag(_TIMER_3_IRQ);
