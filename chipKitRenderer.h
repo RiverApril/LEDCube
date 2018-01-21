@@ -39,7 +39,8 @@ const int levelPins[4] = { 8, 9, 10, 11};
 
 int current_level = 0;
 
-bool inputs[KEY_COUNT];
+bool inputDown[KEY_COUNT];
+bool inputPressed[KEY_COUNT];
 
 Cube display;
 
@@ -81,10 +82,15 @@ void start_timer_3(uint32_t frequency) {
 void gameLoop( void(*update)(bool*) ) {
   
   for(int n = 0; n < KEY_COUNT; n++){
-    inputs[n] = !digitalRead(inputPins[n]);
+
+    bool now = !digitalRead(inputPins[n]);
+
+    inputPressed[n] = !inputDown[n] && now;
+    inputDown[n] = now;
+    
   }
 
-  update(inputs);
+  update(inputPressed);
   delay(100);
 }
 
@@ -104,7 +110,8 @@ void startRenderer(){
   
   for(int n = 0; n < KEY_COUNT; n++){
     pinMode(inputPins[n], INPUT);
-    inputs[n] = false;
+    inputDown[n] = false;
+    inputPressed[n] = false;
   }
 
   start_timer_3(8000);
