@@ -3,7 +3,7 @@
 #include "game.h"
 
 void setup(){
-  startRenderer();
+  startRenderer(initGame);
 }
 
 void loop(){

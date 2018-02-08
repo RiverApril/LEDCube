@@ -17,6 +17,9 @@
 #define KEY_Exit 7
 #define KEY_COUNT 8
 
+
+#define FPS 10
+
 /* Chipkit Max32 pin weirdness:
  *  
  * Pins 24, 26, 27 are not able to output voltage
@@ -33,7 +36,7 @@
 const int columnBluePins[4][4] = { {44, 46, 48, 5}, {36, 38, 40, 42}, {28, 30, 32, 34}, {52, 22, 2, 1} };
 const int columnRedPins[4][4] = { {47, 39, 31, 6}, {49, 41, 33, 0}, {4, 3, 35, 25}, {53, 45, 37, 23} };
 
-const int inputPins[KEY_COUNT] = { 17, 21, 19, 18, 16, 20, 15, 14};
+const int inputPins[KEY_COUNT] = { 21, 19, 18, 20, 16, 14, 15, 17};
 
 const int levelPins[4] = { 8, 9, 10, 11};
 
@@ -79,7 +82,7 @@ void start_timer_3(uint32_t frequency) {
   setIntEnable(_TIMER_3_IRQ);
 } 
 
-void gameLoop( void(*update)(bool*) ) {
+void gameLoop( void(*update)(bool*, bool*) ) {
   
   for(int n = 0; n < KEY_COUNT; n++){
 
@@ -90,11 +93,11 @@ void gameLoop( void(*update)(bool*) ) {
     
   }
 
-  update(inputPressed);
-  delay(100);
+  update(inputPressed, inputDown);
+  delay(1000/FPS);
 }
 
-void startRenderer(){
+void startRenderer( void(*initGame)() ){
   for(int x = 0; x < 4; x++){
     for(int y = 0; y < 4; y++){
       pinMode(columnRedPins[x][y], OUTPUT);
@@ -113,6 +116,8 @@ void startRenderer(){
     inputDown[n] = false;
     inputPressed[n] = false;
   }
+
+  initGame();
 
   start_timer_3(8000);
   

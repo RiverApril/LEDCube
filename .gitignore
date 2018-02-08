@@ -3,3 +3,5 @@
 cursesGame
 
 .vscode/
+makeLetterCodes
+letterCodes.cpp

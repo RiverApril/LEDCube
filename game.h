@@ -8,24 +8,22 @@
 #define GAME_COUNT 5
 
 #define TEXT_SPEED 6
+#define SCROLL_SPEED 3
+
+#define noscroll
 
 int tick = 0;
 unsigned char game = GAME_MENU;
 bool needsReset = true;
 
-Cube utilCube1;
-Cube utilCube2;
-bool utilBool1;
-bool utilBool2;
-unsigned char utilUChar1;
-unsigned char utilUChar2;
-unsigned char utilUChar3;
-char utilChar1;
-char utilChar2;
-char utilChar3;
-char utilChar4;
-char utilChar5;
-char utilChar6;
+CodedString codedStrTicTacToe;
+CodedString codedStrConnect4;
+CodedString codedStrBattleShip;
+CodedString codedStrReversi;
+
+CodedString codedStrBattleShipP1, codedStrBattleShipP2;
+CodedString codedStrBattleShipP1Setup, codedStrBattleShipP2Setup;
+CodedString codedStrBattleShipP1Wins, codedStrBattleShipP2Wins;
 
 namespace CursorSpace{
     char cursorX = 0;
@@ -63,6 +61,7 @@ namespace MenuSpace{
 
         switch(select+1){
             case GAME_TTT:{
+              #ifdef noscroll
                 if(tick < logoTime){
                     display.set2DPattern(3, "# # ", 1);
                     display.set2DPattern(2, " #  ", 1);
@@ -85,10 +84,15 @@ namespace MenuSpace{
                         case 9: break;
                     }
                 }
+                #else
+                display.scrollString(codedStrTicTacToe, tick/SCROLL_SPEED, 2);
+                #endif
 
                 break;
             }
             case GAME_CONNECT4:{
+              #ifdef noscroll
+              
                 if(tick < logoTime){
                     display.set2DPattern(3, "### ", 1);
                     display.set2DPattern(2, "#   ", 1);
@@ -111,11 +115,14 @@ namespace MenuSpace{
                         case 8: break;
                     }
                 }
+                #else
+                display.scrollString(codedStrConnect4, tick/SCROLL_SPEED, 2);
+                #endif
 
                 break;
             }
             case GAME_BATTLESHIP:{
-
+                #ifdef noscroll
                 if(tick < logoTime){
                     display.set2DPattern(3, "  # ", 3);
                     display.set2DPattern(2, " #  ", 1);
@@ -136,10 +143,14 @@ namespace MenuSpace{
                         case 10: break;
                     }
                 }
+                #else
+                display.scrollString(codedStrBattleShip, tick/SCROLL_SPEED, 2);
+                #endif
 
                 break;
             }
             case GAME_REVERSI:{
+                #ifdef noscroll
                 if(tick < logoTime){
                     display.set2DPattern(2, "  # ", 1);
                     display.set2DPattern(1, " #  ", 1);
@@ -157,6 +168,9 @@ namespace MenuSpace{
                         case 7: break;
                     }
                 }
+                #else
+                display.scrollString(codedStrReversi, tick/SCROLL_SPEED, 2);
+                #endif
                 break;
             }
         }
@@ -396,10 +410,10 @@ void checkWin(Cube& ticTacToe, Cube& winCube, unsigned char& winner){
 namespace TTTSpace{
     using namespace CursorSpace;
 
-    Cube& ticTacToe = utilCube1;
-    Cube& winCube = utilCube2;
-    bool& player1Turn = utilBool1;
-    unsigned char& winner = utilUChar1;
+    Cube ticTacToe;
+    Cube winCube;
+    bool player1Turn;
+    unsigned char winner;
 
     void play(bool inputs[]){
 
@@ -468,10 +482,10 @@ namespace TTTSpace{
 namespace CONNECT4Space{
     using namespace CursorSpace;
 
-    Cube& sandCube = utilCube1;
-    Cube& winCube = utilCube2;
-    bool& player1Turn = utilBool1;
-    unsigned char& winner = utilUChar1;
+    Cube sandCube;
+    Cube winCube;
+    bool player1Turn;
+    unsigned char winner;
 
     void play(bool inputs[]){
 
@@ -546,8 +560,8 @@ namespace CONNECT4Space{
 
 namespace BATTLESHIPSpace{
 
-    Cube& p1Field = utilCube1;
-    Cube& p2Field = utilCube2;
+    Cube p1Field;
+    Cube p2Field;
     const unsigned char modeChoosePre = 0;
     const unsigned char modeChoosePos = 1;
     const unsigned char modeChooseAngle = 2;
@@ -560,16 +574,16 @@ namespace BATTLESHIPSpace{
     const unsigned char modeWinner = 7;
     const unsigned char modeShowFieldEnd = 8;
 
-    unsigned char& winner = utilUChar1;
-    unsigned char& mode = utilUChar2;
-    unsigned char& editShipIndex = utilUChar3;
-    bool& player1Turn = utilBool1;
-    char& shipPlaceX = utilChar1;
-    char& shipPlaceY = utilChar2;
-    char& shipPlaceZ = utilChar3;
-    char& shipPlaceAX = utilChar4;
-    char& shipPlaceAY = utilChar5;
-    char& shipPlaceAZ = utilChar6;
+    unsigned char winner;
+    unsigned char mode;
+    unsigned char editShipIndex;
+    bool player1Turn;
+    char shipPlaceX;
+    char shipPlaceY;
+    char shipPlaceZ;
+    char shipPlaceAX;
+    char shipPlaceAY;
+    char shipPlaceAZ;
 
     const unsigned char shipCount = 4;
     const unsigned char shipSizes[shipCount] = {3, 3, 3, 2};
@@ -597,6 +611,7 @@ namespace BATTLESHIPSpace{
 
         switch(mode){
             case modeChoosePre:{
+                #ifdef noscroll
                 switch((tick/TEXT_SPEED)%8){
                     case 0: display.letter('P', 1); break;
                     case 1: display.letter(player1Turn?'1':'2', 1); break;
@@ -607,6 +622,9 @@ namespace BATTLESHIPSpace{
                     case 6: display.letter('P', 2); break;
                     case 7: break;
                 }
+                #else
+                display.scrollString(player1Turn?codedStrBattleShipP1Setup:codedStrBattleShipP2Setup, tick/SCROLL_SPEED, 2);
+                #endif
                 if(inputs[KEY_Enter]){
                     mode = modeChoosePos;
                 }
@@ -692,10 +710,14 @@ namespace BATTLESHIPSpace{
                 break;
             }
             case modeReadyForPlayer:{
+                #ifdef noscroll
                 switch((tick/TEXT_SPEED)%2){
                     case 0: display.letter('P', 1); break;
                     case 1: display.letter(player1Turn?'1':'2', 1); break;
                 }
+                #else
+                display.scrollString(player1Turn?codedStrBattleShipP1:codedStrBattleShipP2, tick/SCROLL_SPEED, 2);
+                #endif
                 if(inputs[KEY_Enter]){
                     mode = modeOwnFiled;
                 }
@@ -765,6 +787,7 @@ namespace BATTLESHIPSpace{
                 break;
             }
             case modeWinner:{
+                #ifdef noscroll
                 switch((tick/TEXT_SPEED)%8){
                     case 0: display.letter('P', 1); break;
                     case 1: display.letter(player1Turn?'1':'2', 1); break;
@@ -775,6 +798,9 @@ namespace BATTLESHIPSpace{
                     case 6: display.letter('!', 2); break;
                     case 7: break;
                 }
+                #else
+                display.scrollString(player1Turn?codedStrBattleShipP1Wins:codedStrBattleShipP2Wins, tick/SCROLL_SPEED, 2);
+                #endif
                 if(inputs[KEY_Enter]){
                     mode = modeShowFieldEnd;
                     player1Turn = true;
@@ -801,10 +827,10 @@ namespace BATTLESHIPSpace{
 
 namespace REVERSISpace{
 
-    Cube& board = utilCube1;
-    bool& player1Turn = utilBool1;
-    unsigned char& winner = utilUChar1;
-    bool& playerCantPlay = utilBool2;
+    Cube board;
+    bool player1Turn;
+    unsigned char winner;
+    bool playerCantPlay;
 
     bool tryLine(unsigned char player, char x, char y, char z, char xs, char ys, char zs){
         unsigned char other = player==1?2:1;
@@ -1006,7 +1032,23 @@ namespace REVERSISpace{
     }
 }
 
-void update(bool inputs[]){
+void initGame(){
+    #ifndef noscroll
+    codedStrTicTacToe = Cube::makeCodedString("TIC TAC TOE  ");
+    codedStrConnect4 = Cube::makeCodedString("CONNECT 4  ");
+    codedStrBattleShip = Cube::makeCodedString("BATTLE SHIP  ");
+    codedStrReversi = Cube::makeCodedString("REVERSI  ");
+    
+    codedStrBattleShipP1 = Cube::makeCodedString("P1  ");
+    codedStrBattleShipP2 = Cube::makeCodedString("P2  ");
+    codedStrBattleShipP1Setup = Cube::makeCodedString("P1 SETUP  ");
+    codedStrBattleShipP2Setup = Cube::makeCodedString("P2 SETUP  ");
+    codedStrBattleShipP1 = Cube::makeCodedString("P1 WINS  ");
+    codedStrBattleShipP2 = Cube::makeCodedString("P2 WINS  ");
+    #endif
+}
+
+void update(bool inputs[], bool inputsDown[]){
 
     tick++;
 

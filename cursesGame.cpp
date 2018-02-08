@@ -5,7 +5,7 @@
 #include "game.h"
 
 int main(){
-    startRenderer(update); // update is in game.h
+    startRenderer(initGame, update);
     return 0;
 }
 

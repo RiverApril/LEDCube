@@ -15,7 +15,7 @@ bool inputs[KEY_COUNT];
 
 Cube display;
 
-void startRenderer( void(*update)(bool*) ){
+void startRenderer( void(*initGame)(), void(*update)(bool*, bool*) ){
 
     initscr();
     noecho();
@@ -26,6 +26,8 @@ void startRenderer( void(*update)(bool*) ){
     init_pair(2, COLOR_WHITE+8, COLOR_BLUE+8);
     init_pair(3, COLOR_WHITE+8, COLOR_MAGENTA+8);
     timeout(100);
+
+    initGame();
     
     while(true){
 
@@ -45,7 +47,7 @@ void startRenderer( void(*update)(bool*) ){
             case 27: inputs[KEY_Exit] = true; break;
         }
 
-        update(inputs);
+        update(inputs, inputs);
 
         for(unsigned char y = 0; y < 4; y++){
             for(unsigned char z = 0; z < 4; z++){
