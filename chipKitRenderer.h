@@ -7,18 +7,8 @@
 #define T3_PS_1_1 0
 #define T3_SOURCE_INT 0
 
-#define KEY_Xd 0
-#define KEY_Xu 1
-#define KEY_Yd 2
-#define KEY_Yu 3
-#define KEY_Zd 4
-#define KEY_Zu 5
-#define KEY_Enter 6
-#define KEY_Exit 7
-#define KEY_COUNT 8
 
-
-#define FPS 10
+#define FPS 1
 
 /* Chipkit Max32 pin weirdness:
  *  
@@ -36,14 +26,9 @@
 const int columnBluePins[4][4] = { {44, 46, 48, 5}, {36, 38, 40, 42}, {28, 30, 32, 34}, {52, 22, 2, 1} };
 const int columnRedPins[4][4] = { {47, 39, 31, 6}, {49, 41, 33, 0}, {4, 3, 35, 25}, {53, 45, 37, 23} };
 
-const int inputPins[KEY_COUNT] = { 21, 19, 18, 20, 16, 14, 15, 17};
-
 const int levelPins[4] = { 8, 9, 10, 11};
 
 int current_level = 0;
-
-bool inputDown[KEY_COUNT];
-bool inputPressed[KEY_COUNT];
 
 Cube display;
 
@@ -82,19 +67,8 @@ void start_timer_3(uint32_t frequency) {
   setIntEnable(_TIMER_3_IRQ);
 } 
 
-void gameLoop( void(*update)(bool*, bool*) ) {
-  
-  for(int n = 0; n < KEY_COUNT; n++){
-
-    bool now = !digitalRead(inputPins[n]);
-
-    inputPressed[n] = !inputDown[n] && now;
-    inputDown[n] = now;
-    
-  }
-
-  update(inputPressed, inputDown);
-  delay(1000/FPS);
+void gameLoop( void(*update)() ) {
+  update();
 }
 
 void startRenderer( void(*initGame)() ){
@@ -109,12 +83,6 @@ void startRenderer( void(*initGame)() ){
   for(int z = 0; z < 4; z++){
     pinMode(levelPins[z], OUTPUT);
     digitalWrite(levelPins[z], LOW);
-  }
-  
-  for(int n = 0; n < KEY_COUNT; n++){
-    pinMode(inputPins[n], INPUT);
-    inputDown[n] = false;
-    inputPressed[n] = false;
   }
 
   initGame();
