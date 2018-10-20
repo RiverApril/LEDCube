@@ -69,7 +69,7 @@ Voltage Source -----'\/\/\/\,---+----------- BUTTON PIN
 
 There are 8 buttons total: 6 directional buttons, 2 for each dimension, and 2 buttons for enter and exit.
 
-The button layout that was used is similar to the ncurses simulation using the QWE-ASD layout with 2 more buttons.
+The button layout that was used is similar to a gamepad with the 4 planar directional buttons on the left and the two up/down buttons on the right with enter and exit in the middle.
 
 The column, layer, and input pins used are listed in arrays in the [chipKitRenderer.h](chipKitRenderer.h) file. (but they can be (almost) any pins) 
 
